@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FoodCard } from "../components/FoodCard";
+import { FoodCard } from "../components/FoodsCard";
 import type { FoodItem } from "../models/FoodItem";
 import { Unit } from "../models/Unit";
 
