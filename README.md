@@ -1,240 +1,73 @@
-# 🥗 ShelfLife App — Developer Thinking Guide
+# React + TypeScript + Vite
 
-## 🧠 How to Approach This Project (Like an Engineer)
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-You’re not building “an app.”
+Currently, two official plugins are available:
 
-You’re building **systems**:
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-* Data system (inventory)
-* Input system (scanner + manual)
-* Logic system (recipe ranking)
-* Storage system (offline-first)
-* UI system (display + feedback)
+## React Compiler
 
----
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## 🧩 Step 1: Break the Project into Systems
+## Expanding the ESLint configuration
 
-### 🔹 Inventory System (Core Brain)
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-Ask yourself:
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-* What is a food item in code?
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-👉 Think in terms of a **model/class**
-
-```
-FoodItem
-- name
-- brand
-- quantity
-- unit (g, kg, count)
-- expiryDate
-- category (fridge/pantry/freezer)
-```
-
-### 🔥 Your Task
-
-* Write this as a class (or data structure)
-* Ask: **What must every item ALWAYS have?**
-
----
-
-## 🧩 Step 2: Think Like a Database (Offline-First)
-
-Key rule:
-
-> “All data must live locally first”
-
-Ask:
-
-* Where do I store items?
-* How do I retrieve them?
-* How do I update them?
-
-👉 That leads to:
-
-```
-CREATE → READ → UPDATE → DELETE
-(CRUD)
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-### 🔥 Your Task
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-Design functions like:
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-* addItem()
-* getAllItems()
-* updateItem()
-* deleteItem()
-
-❗ Don’t code yet — just plan them clearly
-
----
-
-## 🧩 Step 3: Freshness Logic (Thinking First)
-
-The “Freshness Meter” is **logic first**, not UI.
-
-Ask:
-
-* How do I calculate freshness?
-
-👉 Hint:
-
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
-freshness = (today → expiryDate)
-```
-
-Now think deeper:
-
-* What happens if expiry = today?
-* What happens if expiry < today?
-
-### 🔥 Your Task
-
-Write logic in plain English:
-
-> “If X, then Y”
-
----
-
-## 🧩 Step 4: Barcode Scanner (Input System)
-
-Don’t think “camera” first.
-
-Think:
-
-```
-Input → Data → Save
-```
-
-Flow:
-
-1. Scan barcode → get code
-2. Send code → API
-3. API returns product info
-4. User fills missing info
-5. Save to DB
-
-### 🔥 Your Task
-
-Understand this flow:
-
-```
-SCAN → FETCH → COMPLETE → SAVE
-```
-
-If you can explain it clearly, you understand it.
-
----
-
-## 🧩 Step 5: Recipe Engine (Core Logic)
-
-You are NOT just fetching recipes.
-
-You are **ranking them**.
-
----
-
-### 🧠 Think Like This:
-
-Each recipe gets a **score**
-
-#### Factors:
-
-* Uses expiring items → HIGH score
-* Uses many owned ingredients → HIGH score
-* Missing ingredients → LOWER score
-
----
-
-### 🔥 Your Task
-
-Define your own scoring system:
-
-```
-score =
-+50 if uses expiring item
-+10 per ingredient matched
--5 per missing ingredient
-```
-
-👉 You must justify your scoring choices.
-
----
-
-## 🧩 Step 6: Unit Conversion (Logic Challenge)
-
-Ask:
-
-* How do I compare 1kg vs 200g?
-
-👉 You need a **standard unit**
-
-### 🔥 Your Task
-
-Define:
-
-```
-1 kg = 1000 g
-```
-
-Then ask:
-
-* Should everything be converted before comparing?
-
----
-
-## 🧩 Step 7: Notifications (Automation Thinking)
-
-This is **time-based logic**
-
-Ask:
-
-* When should the app check expiry?
-* What condition triggers a notification?
-
-### 🔥 Your Task
-
-Define logic like:
-
-```
-IF expiryDate - today <= 2 days
-THEN send notification
-```
-
----
-
-## 🧩 Step 8: Sync System (Advanced Thinking)
-
-Key idea:
-
-* Local DB = source of truth
-* Cloud = backup/sync
-
-Ask:
-
-* What happens when 2 users edit the same item?
-
-👉 This introduces:
-
-* Conflict resolution
-
-(You don’t need to solve it yet — just understand the problem.)
-
----
-
-## 🚀 Final Mindset
-
-For every feature:
-
-1. Describe it in English
-2. Break it into steps
-3. Write the logic
-4. Then code
-
----
-
-💡 If you can design the logic clearly, building the app becomes much easier.
