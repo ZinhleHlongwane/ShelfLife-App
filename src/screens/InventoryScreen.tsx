@@ -1,7 +1,9 @@
-import { FoodCard } from "../components/FoodsCard";
-import { FoodItem } from "../models/FoodItem";
+import { FoodCard } from "../components/FoodCard";
+import type { FoodItem } from "../models/FoodItem";
 import { Unit } from "../models/Unit";
 
+// Temporary sample data used to test the UI.
+// Later this will come from local database storage.
 const sampleItems: FoodItem[] = [
   {
     id: "1",
@@ -19,16 +21,36 @@ const sampleItems: FoodItem[] = [
     expiryDate: new Date("2026-08-20"),
     category: "pantry",
   },
+  {
+    id: "3",
+    name: "Chicken Breast",
+    quantity: 500,
+    unit: Unit.GRAM,
+    expiryDate: new Date("2026-04-25"),
+    category: "fridge",
+  },
 ];
 
+// InventoryScreen displays the full inventory page.
 export const InventoryScreen = () => {
   return (
-    <div>
-      <h1>Inventory</h1>
+    <main
+      style={{
+        maxWidth: "700px",
+        margin: "0 auto",
+        padding: "24px",
+        fontFamily: "Arial, sans-serif",
+        backgroundColor: "#f7f7f7",
+        minHeight: "100vh",
+      }}
+    >
+      <h1>ShelfLife Inventory</h1>
+      <p>Track food freshness and reduce waste.</p>
 
+      {/* Loop through all sample items and render one FoodCard for each item */}
       {sampleItems.map((item) => (
         <FoodCard key={item.id} item={item} />
       ))}
-    </div>
+    </main>
   );
 };
