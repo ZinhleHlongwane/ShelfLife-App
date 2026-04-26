@@ -1,18 +1,22 @@
-// Import what I need
-import { FoodItem } from "../../models/FoodItem";
+import type { FoodItem } from "../../models/FoodItem";
 import { isExpired, isExpiringSoon } from "../../utils/dateHelpers";
 
+// FoodStatus is the status label our logic can return.
+// This prevents random strings from being used.
 export type FoodStatus = "expired" | "expiringSoon" | "fresh";
 
+// Decides the status of a food item based on its expiry date.
 export const getFoodStatus = (item: FoodItem): FoodStatus => {
-    // Call the function and pass data
-    if (isExpired(item.expiryDate)) {
-        return "expired";
-    }
+  // Check expired first because expired items are more urgent
+  if (isExpired(item.expiryDate)) {
+    return "expired";
+  }
 
-    if (isExpiringSoon(item.expiryDate)) {
-        return "expiringSoon";
-    }
+  // If not expired, check if it is close to expiring
+  if (isExpiringSoon(item.expiryDate)) {
+    return "expiringSoon";
+  }
 
-    return "fresh";
-}
+  // If it is not expired or expiring soon, it is fresh
+  return "fresh";
+};
